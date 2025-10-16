@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WellTech AI MedSuite™ - Mobile Upload</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #00d4ff;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+        
+        .file-upload {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-label {
+            display: block;
+            padding: 30px;
+            border: 3px dashed rgba(0, 212, 255, 0.5);
+            border-radius: 15px;
+            text-align: center;
+            background: rgba(0, 212, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .file-label:hover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.2);
+        }
+        
+        .file-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            color: #00d4ff;
+        }
+        
+        .file-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .file-subtext {
+            font-size: 14px;
+            color: #a0a0a0;
+        }
+        
+        .file-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .upload-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            border: none;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+        
+        .upload-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #0099cc);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .result.success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+        }
+        
+        .result.error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .logo {
+                font-size: 24px;
+            }
+            
+            .file-label {
+                padding: 20px;
+                min-height: 100px;
+            }
+            
+            .file-icon {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">WellTech AI MedSuite™</div>
+            <div class="subtitle">Professional Clinical AI Solutions - Mobile Upload</div>
+        </div>
+        
+        <form id="uploadForm">
+            <div class="form-group">
+                <label for="clientName">Subject Identifier</label>
+                <input type="text" id="clientName" name="client_name" placeholder="Enter subject designation" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="therapyType">Therapy Protocol</label>
+                <select id="therapyType" name="therapy_type" required>
+                    <option value="CBT">Cognitive Behavioral Protocol</option>
+                    <option value="DBT">Dialectical Behavior Protocol</option>
+                    <option value="ACT">Acceptance & Commitment Protocol</option>
+                    <option value="Psychodynamic">Psychodynamic Protocol</option>
+                    <option value="Humanistic">Humanistic Protocol</option>
+                    <option value="EMDR">EMDR Protocol</option>
+                    <option value="Custom">Custom Protocol</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="summaryFormat">Output Format</label>
+                <select id="summaryFormat" name="summary_format" required>
+                    <option value="SOAP">SOAP Protocol (Subjective, Objective, Assessment, Plan)</option>
+                    <option value="BIRP">BIRP Protocol (Behavior, Intervention, Response, Plan)</option>
+                    <option value="General">General Analysis Format</option>
+                </select>
+            </div>
+            
+            <div class="file-upload">
+                <input type="file" id="audioFile" name="audio_file" class="file-input" accept=".mp3,.wav,.m4a,.mp4,.webm,.ogg" required>
+                <label for="audioFile" class="file-label">
+                    <div class="file-icon">🎵</div>
+                    <div class="file-text">Tap to select audio file</div>
+                    <div class="file-subtext">MP3, WAV, M4A, MP4 • Max 100MB</div>
+                </label>
+                <div class="file-info" id="fileInfo"></div>
+            </div>
+            
+            <button type="submit" class="upload-btn" id="uploadBtn">
+                🚀 Initialize Analysis
+            </button>
+            
+            <div class="progress" id="progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
+            <div class="result" id="result"></div>
+        </form>
+    </div>
+    
+    <script>
+        const form = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('audioFile');
+        const fileInfo = document.getElementById('fileInfo');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const progress = document.getElementById('progress');
+        const progressBar = document.getElementById('progressBar');
+        const result = document.getElementById('result');
+        
+        // File selection handler
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+                fileInfo.innerHTML = `
+                    <strong>Selected:</strong> ${file.name}<br>
+                    <strong>Size:</strong> ${fileSize} MB<br>
+                    <strong>Type:</strong> ${file.type}
+                `;
+                fileInfo.style.display = 'block';
+            }
+        });
+        
+        // Form submission handler
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            
+            // Show progress
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Processing...';
+            progress.style.display = 'block';
+            result.style.display = 'none';
+            
+            // Simulate progress
+            let progressValue = 0;
+            const progressInterval = setInterval(() => {
+                progressValue += Math.random() * 15;
+                if (progressValue > 90) progressValue = 90;
+                progressBar.style.width = progressValue + '%';
+            }, 200);
+            
+            try {
+                const response = await fetch('/api/therapy/sessions', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                // Complete progress
+                clearInterval(progressInterval);
+                progressBar.style.width = '100%';
+                
+                setTimeout(() => {
+                    progress.style.display = 'none';
+                    
+                    if (data.success) {
+                        result.className = 'result success';
+                        result.innerHTML = `
+                            <h3>✅ Analysis Complete!</h3>
+                            <p><strong>Session ID:</strong> ${data.sessionId}</p>
+                            <p><strong>Confidence:</strong> ${data.confidenceScore}%</p>
+                            <p><strong>Status:</strong> ${data.message}</p>
+                            <p style="margin-top: 15px;">
+                                <a href="/" style="color: #00d4ff;">View Full Results</a>
+                            </p>
+                        `;
+                    } else {
+                        throw new Error(data.error || 'Upload failed');
+                    }
+                    
+                    result.style.display = 'block';
+                }, 500);
+                
+            } catch (error) {
+                clearInterval(progressInterval);
+                progress.style.display = 'none';
+                
+                result.className = 'result error';
+                result.innerHTML = `
+                    <h3>❌ Upload Failed</h3>
+                    <p>${error.message}</p>
+                    <p style="margin-top: 10px;">Please try again or contact support.</p>
+                `;
+                result.style.display = 'block';
+            }
+            
+            // Reset button
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = '🚀 Initialize Analysis';
+        });
+    </script>
+</body>
+</html>
+
