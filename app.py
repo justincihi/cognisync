@@ -15,8 +15,9 @@ import jwt
 from datetime import datetime, timedelta
 from contextlib import contextmanager
 from functools import wraps
-from flask import Flask, request, jsonify, send_from_directory, render_template_string
+from flask import Flask, request, jsonify, send_from_directory, render_template_string, send_file
 from flask_cors import CORS
+from werkzeug.utils import secure_filename
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -30,6 +31,10 @@ CORS(app)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'cognisync-2024')
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', secrets.token_hex(32))
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB
+app.config['UPLOAD_FOLDER'] = 'uploads'
+
+# Ensure upload directory exists
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Database context manager
 @contextmanager
@@ -40,6 +45,41 @@ def get_db():
         yield conn
     finally:
         conn.close()
+
+
+# File storage helper function
+def save_uploaded_file(uploaded_file, user_id, session_id):
+    """Save uploaded file to disk and return file info"""
+    try:
+        # Create user-specific directory
+        user_upload_dir = os.path.join(app.config['UPLOAD_FOLDER'], str(user_id))
+        os.makedirs(user_upload_dir, exist_ok=True)
+        
+        # Generate unique filename
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        original_filename = secure_filename(uploaded_file.filename)
+        unique_filename = f"{session_id}_{original_filename}"
+        file_path = os.path.join(user_upload_dir, unique_filename)
+        
+        # Save file
+        uploaded_file.save(file_path)
+        file_size = os.path.getsize(file_path)
+        
+        logger.info(f"✅ File saved successfully: {file_path} ({file_size} bytes)")
+        
+        return {
+            'file_path': file_path,
+            'file_size': file_size,
+            'file_name': original_filename,
+            'success': True
+        }
+    except Exception as e:
+        logger.error(f"❌ File save error: {e}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
 
 # Initialize database
 def init_database():
@@ -84,6 +124,9 @@ def init_database():
                 validation_analysis TEXT,
                 confidence_score REAL,
                 status TEXT DEFAULT 'pending',
+                file_path TEXT,
+                file_size INTEGER,
+                file_name TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users (id)
@@ -711,6 +754,9 @@ def neural_simulation():
 @require_active_user
 def create_session():
     try:
+        file_info = None
+        session_id = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
         # Handle both JSON and multipart form data
         if request.content_type and 'multipart/form-data' in request.content_type:
             # Handle file upload
@@ -736,9 +782,17 @@ def create_session():
                 }
                 uploaded_file.seek(0)  # Reset file pointer
                 
-                logger.info(f"File upload received: {file_info['original_name']} ({file_info['size']} bytes)")
+                # SAVE FILE TO DISK
+                file_info = save_uploaded_file(uploaded_file, request.current_user['user_id'], session_id)
                 
-                transcript_note = f"Audio file '{file_info['original_name']}' ({file_info['size']} bytes) received and would be processed by Whisper API in production."
+                if not file_info['success']:
+                    return jsonify({
+                        'success': False,
+                        'error': f'File save failed: {file_info.get("error")}'
+                    }), 500
+                
+                logger.info(f"✅ File uploaded and saved: {file_info['file_name']} ({file_info['file_size']} bytes)")
+                transcript_note = f"Audio file '{file_info['file_name']}' ({file_info['file_size']} bytes) uploaded and saved successfully."
             else:
                 transcript_note = "No audio file provided - using simulated session data."
         else:
@@ -756,23 +810,28 @@ def create_session():
         result['transcript'] = transcript_note
         
         # Store in database
-        session_id = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         
         with get_db() as conn:
             cursor = conn.cursor()
             cursor.execute('''
                 INSERT INTO therapy_sessions 
-                (session_id, user_id, client_name, therapy_type, summary_format, transcript, analysis, sentiment_analysis, validation_analysis, confidence_score, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (session_id, user_id, client_name, therapy_type, summary_format, transcript, analysis, sentiment_analysis, validation_analysis, confidence_score, status, file_path, file_size, file_name)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (session_id, request.current_user['user_id'], client_name, therapy_type, summary_format, transcript_note,
                   result['analysis'], json.dumps(result['sentimentAnalysis']), 
-                  result['validationAnalysis'], result['confidenceScore'], 'completed'))
+                  result['validationAnalysis'], result['confidenceScore'], 'completed',
+                  file_info.get('file_path') if 'file_info' in locals() else None,
+                  file_info.get('file_size') if 'file_info' in locals() else None,
+                  file_info.get('file_name') if 'file_info' in locals() else None))
             conn.commit()
         
         return jsonify({
             'success': True,
             'sessionId': session_id,
             'message': 'Session processed successfully',
+            'uploadSuccess': 'file_info' in locals() and file_info.get('success', False),
+            'fileName': file_info.get('file_name') if 'file_info' in locals() else None,
+            'fileSize': file_info.get('file_size') if 'file_info' in locals() else None,
             **result
         })
         
