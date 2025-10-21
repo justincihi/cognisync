@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cognisync™ - Simple Upload Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .file-upload {
+            border: 3px dashed #e0e0e0;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        
+        .file-upload:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .file-upload.dragover {
+            border-color: #667eea;
+            background: #e8f0ff;
+        }
+        
+        .file-upload input[type="file"] {
+            display: none;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .upload-text {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .upload-hint {
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .file-info {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .file-info.show {
+            display: block;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 5px;
+        }
+        
+        .file-size {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .success-message {
+            background: #4caf50;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .success-message.show {
+            display: flex;
+        }
+        
+        .checkmark {
+            font-size: 32px;
+            animation: scaleIn 0.5s ease;
+        }
+        
+        @keyframes scaleIn {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .success-text {
+            flex: 1;
+        }
+        
+        .success-title {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .success-details {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .error-message {
+            background: #f44336;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 Cognisync™</h1>
+        <p class="subtitle">AI-Powered Clinical Documentation - Upload Test</p>
+        
+        <form id="uploadForm">
+            <div class="form-group">
+                <label for="clientName">Patient Code / Subject ID</label>
+                <input type="text" id="clientName" name="clientName" placeholder="Enter patient code" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="therapyType">Therapy Protocol</label>
+                <select id="therapyType" name="therapyType">
+                    <option value="CBT">Cognitive Behavioral Therapy (CBT)</option>
+                    <option value="DBT">Dialectical Behavior Therapy (DBT)</option>
+                    <option value="ACT">Acceptance & Commitment Therapy (ACT)</option>
+                    <option value="Psychodynamic">Psychodynamic Therapy</option>
+                    <option value="Humanistic">Humanistic Therapy</option>
+                    <option value="EMDR">EMDR</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="summaryFormat">Output Format</label>
+                <select id="summaryFormat" name="summaryFormat">
+                    <option value="SOAP">SOAP (Subjective, Objective, Assessment, Plan)</option>
+                    <option value="BIRP">BIRP (Behavior, Intervention, Response, Plan)</option>
+                    <option value="General">General Analysis</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Audio File</label>
+                <div class="file-upload" id="fileUpload">
+                    <input type="file" id="audioFile" name="audioFile" accept=".mp3,.wav,.m4a,.mp4,.webm,.ogg">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Click to select or drag file here</div>
+                    <div class="upload-hint">Supported: MP3, WAV, M4A, MP4, WebM, OGG (Max 100MB)</div>
+                </div>
+                <div class="file-info" id="fileInfo">
+                    <div class="file-name" id="fileName"></div>
+                    <div class="file-size" id="fileSize"></div>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                Upload & Process
+            </button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Processing your file...</div>
+        </div>
+        
+        <div class="success-message" id="successMessage">
+            <div class="checkmark">✅</div>
+            <div class="success-text">
+                <div class="success-title">Upload Complete!</div>
+                <div class="success-details" id="successDetails"></div>
+            </div>
+        </div>
+        
+        <div class="error-message" id="errorMessage"></div>
+    </div>
+    
+    <script>
+        const fileUpload = document.getElementById('fileUpload');
+        const audioFile = document.getElementById('audioFile');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const uploadForm = document.getElementById('uploadForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const successMessage = document.getElementById('successMessage');
+        const successDetails = document.getElementById('successDetails');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        // File upload click handler
+        fileUpload.addEventListener('click', () => {
+            audioFile.click();
+        });
+        
+        // File selection handler
+        audioFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                displayFileInfo(file);
+            }
+        });
+        
+        // Drag and drop handlers
+        fileUpload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUpload.classList.add('dragover');
+        });
+        
+        fileUpload.addEventListener('dragleave', () => {
+            fileUpload.classList.remove('dragover');
+        });
+        
+        fileUpload.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUpload.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                audioFile.files = e.dataTransfer.files;
+                displayFileInfo(file);
+            }
+        });
+        
+        // Display file information
+        function displayFileInfo(file) {
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            fileName.textContent = `📎 ${file.name}`;
+            fileSize.textContent = `Size: ${sizeMB} MB`;
+            fileInfo.classList.add('show');
+        }
+        
+        // Form submission
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Hide previous messages
+            successMessage.classList.remove('show');
+            errorMessage.classList.remove('show');
+            
+            // Show loading
+            loading.classList.add('show');
+            submitBtn.disabled = true;
+            
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('clientName', document.getElementById('clientName').value);
+            formData.append('therapyType', document.getElementById('therapyType').value);
+            formData.append('summaryFormat', document.getElementById('summaryFormat').value);
+            
+            if (audioFile.files[0]) {
+                formData.append('audioFile', audioFile.files[0]);
+            }
+            
+            try {
+                const response = await fetch('/api/therapy/sessions', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                // Hide loading
+                loading.classList.remove('show');
+                submitBtn.disabled = false;
+                
+                if (data.success) {
+                    // Show success message
+                    successDetails.textContent = `File "${data.fileName || 'your file'}" (${(data.fileSize / (1024 * 1024)).toFixed(2)} MB) has been uploaded and saved successfully. Session ID: ${data.sessionId}`;
+                    successMessage.classList.add('show');
+                    
+                    // Reset form
+                    uploadForm.reset();
+                    fileInfo.classList.remove('show');
+                } else {
+                    // Show error
+                    errorMessage.textContent = `Error: ${data.error || 'Upload failed'}`;
+                    errorMessage.classList.add('show');
+                }
+            } catch (error) {
+                // Hide loading
+                loading.classList.remove('show');
+                submitBtn.disabled = false;
+                
+                // Show error
+                errorMessage.textContent = `Error: ${error.message}`;
+                errorMessage.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>
+
