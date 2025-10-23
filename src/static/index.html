@@ -108,6 +108,17 @@
             background: #e8f5e9;
         }
         
+        .file-upload.recording {
+            border-color: #f44336;
+            background: #ffebee;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
         .file-upload input[type="file"] {
             position: absolute;
             top: 0;
@@ -157,6 +168,75 @@
         .file-size {
             color: #666;
             font-size: 13px;
+        }
+        
+        .or-divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .or-divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: #e0e0e0;
+        }
+        
+        .or-divider span {
+            background: white;
+            padding: 0 16px;
+            color: #999;
+            font-size: 14px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .record-button {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #f44336;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            color: #f44336;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .record-button:active {
+            transform: scale(0.98);
+        }
+        
+        .record-button.recording {
+            background: #f44336;
+            color: white;
+        }
+        
+        .record-icon {
+            font-size: 20px;
+        }
+        
+        .recording-timer {
+            display: none;
+            text-align: center;
+            margin-top: 12px;
+            color: #f44336;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .recording-timer.show {
+            display: block;
         }
         
         .btn {
@@ -347,16 +427,26 @@
             <div class="form-group">
                 <label>Audio File</label>
                 <div class="file-upload" id="fileUpload">
-                    <input type="file" id="audioFile" name="audioFile" accept="audio/*,.mp3,.wav,.m4a,.mp4,.webm,.ogg" required>
+                    <input type="file" id="audioFile" name="audioFile" accept="audio/*,.mp3,.wav,.m4a,.mp4,.webm,.ogg">
                     <div class="upload-icon">📁</div>
                     <div class="upload-text">Tap to select audio file</div>
-                    <div class="upload-hint">MP3, WAV, M4A, MP4, WebM, OGG • Max 100MB</div>
+                    <div class="upload-hint">MP3, WAV, M4A, MP4, WebM, OGG • Max 500MB</div>
                 </div>
                 <div class="file-info" id="fileInfo">
                     <div class="file-name" id="fileName"></div>
                     <div class="file-size" id="fileSize"></div>
                 </div>
             </div>
+            
+            <div class="or-divider">
+                <span>OR</span>
+            </div>
+            
+            <button type="button" class="record-button" id="recordBtn">
+                <span class="record-icon">🎙️</span>
+                <span id="recordText">Record Live Session</span>
+            </button>
+            <div class="recording-timer" id="recordingTimer">Recording: 0:00</div>
             
             <button type="submit" class="btn btn-primary" id="submitBtn">
                 Upload & Process
@@ -393,6 +483,14 @@
         const successMessage = document.getElementById('successMessage');
         const successDetails = document.getElementById('successDetails');
         const errorMessage = document.getElementById('errorMessage');
+        const recordBtn = document.getElementById('recordBtn');
+        const recordText = document.getElementById('recordText');
+        const recordingTimer = document.getElementById('recordingTimer');
+        
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let recordingStartTime = null;
+        let recordingInterval = null;
         
         // File selection handler
         audioFile.addEventListener('change', (e) => {
@@ -400,6 +498,7 @@
             if (file) {
                 displayFileInfo(file);
                 fileUpload.classList.add('has-file');
+                fileUpload.classList.remove('recording');
             }
         });
         
@@ -411,13 +510,88 @@
             fileInfo.classList.add('show');
         }
         
+        // Record button handler
+        recordBtn.addEventListener('click', async () => {
+            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                await startRecording();
+            } else {
+                stopRecording();
+            }
+        });
+        
+        // Start recording
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                recordedChunks = [];
+                
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) {
+                        recordedChunks.push(e.data);
+                    }
+                };
+                
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                    const file = new File([blob], `recording_${Date.now()}.webm`, { type: 'audio/webm' });
+                    
+                    // Create a DataTransfer to set the file input
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    audioFile.files = dataTransfer.files;
+                    
+                    displayFileInfo(file);
+                    fileUpload.classList.add('has-file');
+                    fileUpload.classList.remove('recording');
+                    
+                    // Stop all tracks
+                    stream.getTracks().forEach(track => track.stop());
+                };
+                
+                mediaRecorder.start();
+                recordingStartTime = Date.now();
+                
+                // Update UI
+                recordBtn.classList.add('recording');
+                recordText.textContent = 'Stop Recording';
+                fileUpload.classList.add('recording');
+                recordingTimer.classList.add('show');
+                
+                // Start timer
+                recordingInterval = setInterval(updateRecordingTimer, 1000);
+                
+            } catch (error) {
+                showError('Microphone access denied or not available. Please enable microphone permissions.');
+            }
+        }
+        
+        // Stop recording
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                recordBtn.classList.remove('recording');
+                recordText.textContent = 'Record Live Session';
+                recordingTimer.classList.remove('show');
+                clearInterval(recordingInterval);
+            }
+        }
+        
+        // Update recording timer
+        function updateRecordingTimer() {
+            const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            recordingTimer.textContent = `Recording: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
         // Form submission
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             // Validate file is selected
             if (!audioFile.files[0]) {
-                showError('Please select an audio file');
+                showError('Please select an audio file or record a session');
                 return;
             }
             
