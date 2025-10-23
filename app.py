@@ -31,6 +31,15 @@ CORS(app)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'cognisync-2024')
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', secrets.token_hex(32))
 app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500MB
+
+# AI Processing Mode
+USE_REAL_AI = os.environ.get('USE_REAL_AI', 'false').lower() == 'true'
+if USE_REAL_AI and not AI_AVAILABLE:
+    print("⚠️  Real AI requested but not available - falling back to demo mode")
+    USE_REAL_AI = False
+
+print(f"🤖 AI Mode: {'REAL AI PROCESSING' if USE_REAL_AI else 'DEMO MODE'}")
+
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
 # Ensure upload directory exists
@@ -736,7 +745,48 @@ def neural_simulation():
         summary_format = data.get('summaryFormat', 'SOAP')
         
         # Generate analysis
-        result = generate_comprehensive_analysis(client_name, therapy_type, summary_format)
+        # Generate analysis (AI or demo mode)
+        if USE_REAL_AI and file_info and file_info.get('success'):
+            logger.info("🤖 Using REAL AI processing...")
+            # Get previous sessions for pattern analysis
+            cursor.execute('''
+                SELECT analysis, sentiment_analysis, created_at 
+                FROM therapy_sessions 
+                WHERE user_id = ? AND client_name = ?
+                ORDER BY created_at DESC
+                LIMIT 10
+            ''', (user_id, client_name))
+            previous_sessions = [
+                {'summary': row[0], 'sentiment': row[1], 'date': row[2]}
+                for row in cursor.fetchall()
+            ]
+            
+            # Process with real AI
+            ai_results = process_therapy_session(
+                file_info['file_path'],
+                client_name,
+                therapy_type,
+                summary_format,
+                previous_sessions
+            )
+            
+            if ai_results['success']:
+                transcript_note = ai_results.get('transcript', 'Transcription completed')
+                analysis_result = {
+                    'analysis': ai_results.get('analysis', ''),
+                    'sentimentAnalysis': ai_results.get('sentiment_analysis', {}),
+                    'validationAnalysis': 'AI-powered analysis',
+                    'confidenceScore': ai_results.get('confidence_score', 0.95),
+                    'patternAnalysis': ai_results.get('pattern_analysis', None)
+                }
+            else:
+                logger.error(f"AI processing failed: {ai_results.get('error')}")
+                analysis_result = generate_comprehensive_analysis(client_name, therapy_type, summary_format)
+        else:
+            logger.info("🎭 Using DEMO mode...")
+            analysis_result = generate_comprehensive_analysis(client_name, therapy_type, summary_format)
+            transcript_note = f"[DEMO MODE] File uploaded: {file_info.get('file_name', 'unknown')} ({file_info.get('file_size', 0)} bytes)" if file_info else "Demo session"
+
         
         return jsonify({
             'success': True,
