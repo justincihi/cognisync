@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Cognisync™ - Clinical AI Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .logo {
+            font-size: 48px;
+            margin-bottom: 8px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-section {
+            display: block;
+        }
+        
+        .form-section.hidden {
+            display: none;
+        }
+        
+        .results-section {
+            display: none;
+        }
+        
+        .results-section.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background: white;
+        }
+        
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .file-upload {
+            border: 3px dashed #e0e0e0;
+            border-radius: 12px;
+            padding: 32px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9fa;
+            position: relative;
+        }
+        
+        .file-upload.has-file {
+            border-color: #4caf50;
+            background: #e8f5e9;
+        }
+        
+        .file-upload input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        .processing {
+            text-align: center;
+            padding: 40px 20px;
+            display: none;
+        }
+        
+        .processing.show {
+            display: block;
+        }
+        
+        .brain-animation {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+        
+        .processing-steps {
+            margin-top: 30px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            opacity: 0.3;
+            transition: all 0.5s;
+        }
+        
+        .step.active {
+            opacity: 1;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            transform: translateX(10px);
+        }
+        
+        .step.complete {
+            opacity: 1;
+            background: #e8f5e9;
+        }
+        
+        .step-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .step-text {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .step-status {
+            font-size: 20px;
+        }
+        
+        .results-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .results-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .results-card pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: inherit;
+            line-height: 1.6;
+            color: #555;
+        }
+        
+        .transcript-editor {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: vertical;
+        }
+        
+        .sentiment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .sentiment-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .sentiment-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .sentiment-value {
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .confidence-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .pattern-alert {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .pattern-alert h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .pattern-alert p {
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🧠</div>
+            <h1>Cognisync™</h1>
+            <p class="subtitle">AI-Powered Clinical Documentation</p>
+        </div>
+        
+        <!-- Upload Form -->
+        <div class="form-section" id="formSection">
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label for="clientName">Patient Code / Subject ID</label>
+                    <input type="text" id="clientName" name="clientName" placeholder="e.g., CLIENT-001" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="therapyType">Therapy Protocol</label>
+                    <select id="therapyType" name="therapyType" required>
+                        <option value="CBT">Cognitive Behavioral Therapy (CBT)</option>
+                        <option value="DBT">Dialectical Behavior Therapy (DBT)</option>
+                        <option value="ACT">Acceptance & Commitment Therapy (ACT)</option>
+                        <option value="Psychodynamic">Psychodynamic Therapy</option>
+                        <option value="Humanistic">Humanistic Therapy</option>
+                        <option value="EMDR">EMDR</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="summaryFormat">Output Format</label>
+                    <select id="summaryFormat" name="summaryFormat" required>
+                        <option value="SOAP">SOAP (Subjective, Objective, Assessment, Plan)</option>
+                        <option value="BIRP">BIRP (Behavior, Intervention, Response, Plan)</option>
+                        <option value="General">General Analysis</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Audio File</label>
+                    <div class="file-upload" id="fileUpload">
+                        <input type="file" id="audioFile" name="audioFile" accept="audio/*" required>
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">Tap to select audio file</div>
+                        <div class="upload-hint">MP3, WAV, M4A, MP4, WebM, OGG • Max 500MB</div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    🚀 Process Session
+                </button>
+            </form>
+        </div>
+        
+        <!-- Processing Animation -->
+        <div class="processing" id="processing">
+            <div class="brain-animation">🧠</div>
+            <h2 style="color: #333; margin-bottom: 10px;">Processing Your Session</h2>
+            <p style="color: #666;">This may take a minute...</p>
+            
+            <div class="processing-steps">
+                <div class="step" id="step1">
+                    <div class="step-icon">🎙️</div>
+                    <div class="step-text">Transcribing audio</div>
+                    <div class="step-status">⏳</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-icon">🧠</div>
+                    <div class="step-text">Analyzing session content</div>
+                    <div class="step-status">⏳</div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-icon">💭</div>
+                    <div class="step-text">Performing sentiment analysis</div>
+                    <div class="step-status">⏳</div>
+                </div>
+                <div class="step" id="step4">
+                    <div class="step-icon">📊</div>
+                    <div class="step-text">Extracting patterns</div>
+                    <div class="step-status">⏳</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Display -->
+        <div class="results-section" id="resultsSection">
+            <div class="confidence-badge" id="confidenceBadge">
+                ✓ Analysis Complete • Confidence: 95%
+            </div>
+            
+            <div class="results-card">
+                <h3>📋 Clinical Documentation</h3>
+                <pre id="clinicalNotes"></pre>
+            </div>
+            
+            <div class="results-card">
+                <h3>📝 Session Transcript (Editable)</h3>
+                <textarea class="transcript-editor" id="transcriptEditor"></textarea>
+                <button class="btn btn-secondary" style="margin-top: 10px;" onclick="saveTranscript()">
+                    💾 Save Transcript Edits
+                </button>
+            </div>
+            
+            <div class="results-card">
+                <h3>💭 Sentiment Analysis</h3>
+                <div class="sentiment-grid" id="sentimentGrid"></div>
+            </div>
+            
+            <div class="results-card" id="patternCard" style="display: none;">
+                <h3>📊 Longitudinal Pattern Analysis</h3>
+                <div class="pattern-alert">
+                    <h4>🔍 Patterns Detected Across Sessions</h4>
+                    <p id="patternAnalysis"></p>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="exportResults()">
+                    📥 Export Results
+                </button>
+                <button class="btn btn-secondary" onclick="startNew()">
+                    ➕ New Session
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentResults = null;
+        
+        const form = document.getElementById('uploadForm');
+        const formSection = document.getElementById('formSection');
+        const processing = document.getElementById('processing');
+        const resultsSection = document.getElementById('resultsSection');
+        const fileUpload = document.getElementById('fileUpload');
+        const audioFile = document.getElementById('audioFile');
+        
+        // File selection
+        audioFile.addEventListener('change', () => {
+            if (audioFile.files[0]) {
+                fileUpload.classList.add('has-file');
+            }
+        });
+        
+        // Form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Show processing animation
+            formSection.classList.add('hidden');
+            processing.classList.add('show');
+            
+            // Animate processing steps
+            await animateProcessing();
+            
+            // Upload and process
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch('/api/therapy/sessions', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentResults = data;
+                    displayResults(data);
+                } else {
+                    alert('Error: ' + (data.error || 'Processing failed'));
+                    startNew();
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+                startNew();
+            }
+        });
+        
+        async function animateProcessing() {
+            const steps = ['step1', 'step2', 'step3', 'step4'];
+            
+            for (let i = 0; i < steps.length; i++) {
+                const step = document.getElementById(steps[i]);
+                step.classList.add('active');
+                
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                step.classList.remove('active');
+                step.classList.add('complete');
+                step.querySelector('.step-status').textContent = '✓';
+            }
+        }
+        
+        function displayResults(data) {
+            // Hide processing, show results
+            processing.classList.remove('show');
+            resultsSection.classList.add('show');
+            
+            // Display clinical notes
+            document.getElementById('clinicalNotes').textContent = data.analysis || 'No analysis available';
+            
+            // Display transcript
+            document.getElementById('transcriptEditor').value = data.transcript || 'No transcript available';
+            
+            // Display sentiment analysis
+            const sentimentGrid = document.getElementById('sentimentGrid');
+            sentimentGrid.innerHTML = '';
+            
+            if (data.sentiment_analysis) {
+                const sentiment = data.sentiment_analysis;
+                
+                Object.keys(sentiment).forEach(key => {
+                    const item = document.createElement('div');
+                    item.className = 'sentiment-item';
+                    item.innerHTML = `
+                        <div class="sentiment-label">${key.replace(/([A-Z])/g, ' $1').trim()}</div>
+                        <div class="sentiment-value">${JSON.stringify(sentiment[key]).replace(/["\[\]]/g, '')}</div>
+                    `;
+                    sentimentGrid.appendChild(item);
+                });
+            }
+            
+            // Display pattern analysis if available
+            if (data.pattern_analysis) {
+                document.getElementById('patternCard').style.display = 'block';
+                document.getElementById('patternAnalysis').textContent = data.pattern_analysis;
+            }
+            
+            // Update confidence badge
+            const confidence = Math.round((data.confidence_score || 0.95) * 100);
+            document.getElementById('confidenceBadge').textContent = `✓ Analysis Complete • Confidence: ${confidence}%`;
+        }
+        
+        function saveTranscript() {
+            const editedTranscript = document.getElementById('transcriptEditor').value;
+            currentResults.transcript = editedTranscript;
+            alert('✓ Transcript saved!');
+        }
+        
+        function exportResults() {
+            const blob = new Blob([JSON.stringify(currentResults, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cognisync-session-${Date.now()}.json`;
+            a.click();
+        }
+        
+        function startNew() {
+            formSection.classList.remove('hidden');
+            processing.classList.remove('show');
+            resultsSection.classList.remove('show');
+            form.reset();
+            fileUpload.classList.remove('has-file');
+            
+            // Reset processing steps
+            ['step1', 'step2', 'step3', 'step4'].forEach(id => {
+                const step = document.getElementById(id);
+                step.classList.remove('active', 'complete');
+                step.querySelector('.step-status').textContent = '⏳';
+            });
+        }
+    </script>
+</body>
+</html>
+

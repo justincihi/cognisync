@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>CogniSync™ - Clinical AI Documentation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #4A90A4 0%, #5B7C99 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .header { text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #f0f0f0; }
+        .logo { width: 200px; height: auto; margin: 0 auto 16px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .subtitle { color: #4A90A4; font-size: 14px; font-weight: 500; }
+        .form-section { display: block; }
+        .form-section.hidden { display: none; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #1B3A52; font-weight: 600; font-size: 14px; }
+        input[type="text"], select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        .file-upload {
+            border: 3px dashed #e0e0e0;
+            border-radius: 12px;
+            padding: 32px 20px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8f9fa;
+            position: relative;
+        }
+        .file-upload.has-file { border-color: #4caf50; background: #e8f5e9; }
+        .file-upload input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .or-divider { text-align: center; margin: 20px 0; position: relative; }
+        .or-divider::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #e0e0e0; }
+        .or-divider span { background: white; padding: 0 16px; color: #999; font-size: 14px; font-weight: 600; position: relative; z-index: 1; }
+        .record-button {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #f44336;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            background: white;
+            color: #f44336;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .record-button.recording { background: #f44336; color: white; }
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .btn-primary { background: linear-gradient(135deg, #4A90A4 0%, #5B7C99 100%); color: white; }
+        .processing { text-align: center; padding: 40px 20px; display: none; }
+        .processing.show { display: block; }
+        .logo-animation { width: 150px; height: auto; margin: 0 auto 30px; animation: pulse-logo 2s ease-in-out infinite; }
+        @keyframes pulse-logo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .circle-progress {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 40px 0;
+            position: relative;
+        }
+        .progress-line {
+            position: absolute;
+            height: 3px;
+            background: #e0e0e0;
+            width: calc(100% - 120px);
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+        .progress-line-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4A90A4 0%, #5B7C99 100%);
+            width: 0%;
+            transition: width 1.5s ease;
+        }
+        .circle-step {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.5s ease;
+        }
+        .circle-step.active {
+            border-color: #4A90A4;
+            background: linear-gradient(135deg, #4A90A4 0%, #5B7C99 100%);
+            color: white;
+            transform: scale(1.2);
+            box-shadow: 0 4px 20px rgba(74, 144, 164, 0.4);
+        }
+        .circle-step.complete { border-color: #4caf50; background: #4caf50; color: white; }
+        .step-label {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #666;
+            white-space: nowrap;
+            font-weight: 600;
+        }
+        .results-section { display: none; }
+        .results-section.show { display: block; }
+        .results-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4A90A4;
+        }
+        .transcript-editor {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            resize: vertical;
+        }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn-secondary { background: white; color: #4A90A4; border: 2px solid #4A90A4; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="/cognisync-logo.png" alt="CogniSync Logo" class="logo">
+            <p class="subtitle">AI-Powered Clinical Documentation</p>
+        </div>
+        
+        <div class="form-section" id="formSection">
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label>Patient Code / Subject ID</label>
+                    <input type="text" name="clientName" placeholder="e.g., CLIENT-001" required>
+                </div>
+                <div class="form-group">
+                    <label>Therapy Protocol</label>
+                    <select name="therapyType" required>
+                        <option value="CBT">Cognitive Behavioral Therapy (CBT)</option>
+                        <option value="DBT">Dialectical Behavior Therapy (DBT)</option>
+                        <option value="ACT">Acceptance & Commitment Therapy (ACT)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Output Format</label>
+                    <select name="summaryFormat" required>
+                        <option value="SOAP">SOAP</option>
+                        <option value="BIRP">BIRP</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Audio File</label>
+                    <div class="file-upload" id="fileUpload">
+                        <input type="file" id="audioFile" name="audioFile" accept="audio/*">
+                        <div>📁</div>
+                        <div>Tap to select audio file</div>
+                    </div>
+                </div>
+                <div class="or-divider"><span>OR</span></div>
+                <button type="button" class="record-button" id="recordBtn">
+                    <span>🎙️</span>
+                    <span id="recordText">Record Live Session</span>
+                </button>
+                <button type="submit" class="btn btn-primary">🚀 Process Session</button>
+            </form>
+        </div>
+        
+        <div class="processing" id="processing">
+            <img src="/cognisync-logo.png" class="logo-animation">
+            <p style="color: #1B3A52; font-weight: 600; margin-bottom: 10px;">Processing Your Session</p>
+            <div class="circle-progress">
+                <div class="progress-line"><div class="progress-line-fill" id="progressFill"></div></div>
+                <div class="circle-step" id="circle1"><span>🎙️</span><div class="step-label">Transcribe</div></div>
+                <div class="circle-step" id="circle2"><span>🧠</span><div class="step-label">Analyze</div></div>
+                <div class="circle-step" id="circle3"><span>💭</span><div class="step-label">Sentiment</div></div>
+                <div class="circle-step" id="circle4"><span>📊</span><div class="step-label">Patterns</div></div>
+            </div>
+        </div>
+        
+        <div class="results-section" id="resultsSection">
+            <div class="results-card">
+                <h3>📋 Clinical Documentation</h3>
+                <pre id="clinicalNotes"></pre>
+            </div>
+            <div class="results-card">
+                <h3>📝 Session Transcript</h3>
+                <textarea class="transcript-editor" id="transcriptEditor"></textarea>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="exportResults()">📥 Export</button>
+                <button class="btn btn-secondary" onclick="startNew()">➕ New Session</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentResults = null;
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        
+        document.getElementById('audioFile').addEventListener('change', (e) => {
+            if (e.target.files[0]) document.getElementById('fileUpload').classList.add('has-file');
+        });
+        
+        document.getElementById('recordBtn').addEventListener('click', async () => {
+            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                recordedChunks = [];
+                mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                    const file = new File([blob], `recording_${Date.now()}.webm`, { type: 'audio/webm' });
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    document.getElementById('audioFile').files = dt.files;
+                    document.getElementById('fileUpload').classList.add('has-file');
+                    stream.getTracks().forEach(t => t.stop());
+                };
+                mediaRecorder.start();
+                document.getElementById('recordBtn').classList.add('recording');
+                document.getElementById('recordText').textContent = 'Stop Recording';
+            } else {
+                mediaRecorder.stop();
+                document.getElementById('recordBtn').classList.remove('recording');
+                document.getElementById('recordText').textContent = 'Record Live Session';
+            }
+        });
+        
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('processing').classList.add('show');
+            
+            // Animate circles
+            const circles = ['circle1', 'circle2', 'circle3', 'circle4'];
+            for (let i = 0; i < circles.length; i++) {
+                document.getElementById(circles[i]).classList.add('active');
+                document.getElementById('progressFill').style.width = `${(i + 1) * 25}%`;
+                await new Promise(r => setTimeout(r, 2000));
+                document.getElementById(circles[i]).classList.remove('active');
+                document.getElementById(circles[i]).classList.add('complete');
+            }
+            
+            const formData = new FormData(e.target);
+            const response = await fetch('/api/therapy/sessions', { method: 'POST', body: formData });
+            const data = await response.json();
+            
+            if (data.success) {
+                currentResults = data;
+                document.getElementById('processing').classList.remove('show');
+                document.getElementById('resultsSection').classList.add('show');
+                document.getElementById('clinicalNotes').textContent = data.analysis || 'No analysis';
+                document.getElementById('transcriptEditor').value = data.transcript || 'No transcript';
+            }
+        });
+        
+        function exportResults() {
+            const blob = new Blob([JSON.stringify(currentResults, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cognisync-${Date.now()}.json`;
+            a.click();
+        }
+        
+        function startNew() {
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('resultsSection').classList.remove('show');
+            document.getElementById('uploadForm').reset();
+            ['circle1', 'circle2', 'circle3', 'circle4'].forEach(id => {
+                document.getElementById(id).classList.remove('active', 'complete');
+            });
+            document.getElementById('progressFill').style.width = '0%';
+        }
+    </script>
+</body>
+</html>
