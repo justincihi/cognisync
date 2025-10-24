@@ -25,6 +25,15 @@ logger = logging.getLogger(__name__)
 
 # Initialize Flask app
 app = Flask(__name__, static_folder='static', static_url_path='')
+
+# Check if AI service is available
+AI_AVAILABLE = False
+try:
+    from ai_service import process_therapy_session, generate_demo_analysis
+    AI_AVAILABLE = True
+except ImportError:
+    print("⚠️  AI service not available - running in demo mode only")
+
 CORS(app)
 
 # Configuration
