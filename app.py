@@ -790,7 +790,18 @@ def neural_simulation():
                 }
             else:
                 logger.error(f"AI processing failed: {ai_results.get('error')}")
-                analysis_result = generate_comprehensive_analysis(client_name, therapy_type, summary_format)
+                # Use real AI if file was uploaded
+                if file_info and file_info.get('file_path'):
+                    logger.info(f"🤖 Processing with REAL AI: {file_info['file_path']}")
+                    analysis_result = process_therapy_session(
+                        file_info['file_path'],
+                        client_name,
+                        therapy_type,
+                        summary_format
+                    )
+                else:
+                    logger.info("📋 Using demo analysis (no file)")
+                    analysis_result = generate_comprehensive_analysis(client_name, therapy_type, summary_format)
         else:
             logger.info("🎭 Using DEMO mode...")
             analysis_result = generate_comprehensive_analysis(client_name, therapy_type, summary_format)
