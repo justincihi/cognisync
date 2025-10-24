@@ -4,24 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Cognisync™ - Clinical AI Documentation</title>
+    <title>CogniSync™ - Clinical AI Documentation</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #4A90A4 0%, #5B7C99 100%);
             min-height: 100vh;
             padding: 20px;
-            overflow-x: hidden;
         }
-        
         .container {
             background: white;
             border-radius: 16px;
@@ -30,161 +21,35 @@
             margin: 0 auto;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-        
-        .logo {
-            font-size: 48px;
-            margin-bottom: 8px;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        h1 {
-            color: #333;
-            font-size: 28px;
-            margin-bottom: 4px;
-        }
-        
-        .subtitle {
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .form-section {
-            display: block;
-        }
-        
-        .form-section.hidden {
-            display: none;
-        }
-        
-        .results-section {
-            display: none;
-        }
-        
-        .results-section.show {
-            display: block;
-            animation: slideIn 0.5s ease;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        input[type="text"],
-        select {
+        .header { text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #f0f0f0; }
+        .logo { width: 200px; height: auto; margin: 0 auto 16px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .subtitle { color: #4A90A4; font-size: 14px; font-weight: 500; }
+        .form-section { display: block; }
+        .form-section.hidden { display: none; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #1B3A52; font-weight: 600; font-size: 14px; }
+        input[type="text"], select {
             width: 100%;
             padding: 14px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
             font-size: 16px;
-            transition: border-color 0.3s;
-            background: white;
         }
-        
-        input[type="text"]:focus,
-        select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
         .file-upload {
             border: 3px dashed #e0e0e0;
             border-radius: 12px;
             padding: 32px 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
             background: #f8f9fa;
             position: relative;
         }
-        
-        .file-upload.has-file {
-            border-color: #4caf50;
-            background: #e8f5e9;
-        }
-        
-        .file-upload.recording {
-            border-color: #f44336;
-            background: #ffebee;
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        
-        .file-upload input[type="file"] {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-        
-        .upload-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-        
-        .or-divider {
-            text-align: center;
-            margin: 20px 0;
-            position: relative;
-        }
-        
-        .or-divider::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 50%;
-            height: 1px;
-            background: #e0e0e0;
-        }
-        
-        .or-divider span {
-            background: white;
-            padding: 0 16px;
-            color: #999;
-            font-size: 14px;
-            font-weight: 600;
-            position: relative;
-            z-index: 1;
-        }
-        
+        .file-upload.has-file { border-color: #4caf50; background: #e8f5e9; }
+        .file-upload input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .or-divider { text-align: center; margin: 20px 0; position: relative; }
+        .or-divider::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #e0e0e0; }
+        .or-divider span { background: white; padding: 0 16px; color: #999; font-size: 14px; font-weight: 600; position: relative; z-index: 1; }
         .record-button {
             width: 100%;
             padding: 16px;
@@ -193,7 +58,6 @@
             font-size: 17px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
             background: white;
             color: #f44336;
             display: flex;
@@ -201,29 +65,7 @@
             justify-content: center;
             gap: 10px;
         }
-        
-        .record-button:active {
-            transform: scale(0.98);
-        }
-        
-        .record-button.recording {
-            background: #f44336;
-            color: white;
-        }
-        
-        .recording-timer {
-            display: none;
-            text-align: center;
-            margin-top: 12px;
-            color: #f44336;
-            font-weight: 600;
-            font-size: 16px;
-        }
-        
-        .recording-timer.show {
-            display: block;
-        }
-        
+        .record-button.recording { background: #f44336; color: white; }
         .btn {
             width: 100%;
             padding: 16px;
@@ -232,323 +74,158 @@
             font-size: 17px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
             margin-top: 20px;
         }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .btn-primary { background: linear-gradient(135deg, #4A90A4 0%, #5B7C99 100%); color: white; }
+        .processing { text-align: center; padding: 40px 20px; display: none; }
+        .processing.show { display: block; }
+        .logo-animation { width: 150px; height: auto; margin: 0 auto 30px; animation: pulse-logo 2s ease-in-out infinite; }
+        @keyframes pulse-logo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .circle-progress {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 40px 0;
+            position: relative;
         }
-        
-        .btn-primary:active {
-            transform: scale(0.98);
+        .progress-line {
+            position: absolute;
+            height: 3px;
+            background: #e0e0e0;
+            width: calc(100% - 120px);
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 0;
         }
-        
-        .processing {
-            text-align: center;
-            padding: 40px 20px;
-            display: none;
+        .progress-line-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4A90A4 0%, #5B7C99 100%);
+            width: 0%;
+            transition: width 1.5s ease;
         }
-        
-        .processing.show {
-            display: block;
-        }
-        
-        .brain-animation {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: pulse-brain 2s ease-in-out infinite;
-        }
-        
-        @keyframes pulse-brain {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.1);
-                opacity: 0.8;
-            }
-        }
-        
-        .processing-steps {
-            margin-top: 30px;
-        }
-        
-        .step {
+        .circle-step {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #e0e0e0;
             display: flex;
             align-items: center;
-            padding: 15px;
-            margin-bottom: 10px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            opacity: 0.3;
-            transition: all 0.5s;
-        }
-        
-        .step.active {
-            opacity: 1;
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            transform: translateX(10px);
-        }
-        
-        .step.complete {
-            opacity: 1;
-            background: #e8f5e9;
-        }
-        
-        .step-icon {
+            justify-content: center;
             font-size: 24px;
-            margin-right: 15px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.5s ease;
         }
-        
-        .step-text {
-            flex: 1;
-            font-weight: 500;
+        .circle-step.active {
+            border-color: #4A90A4;
+            background: linear-gradient(135deg, #4A90A4 0%, #5B7C99 100%);
+            color: white;
+            transform: scale(1.2);
+            box-shadow: 0 4px 20px rgba(74, 144, 164, 0.4);
         }
-        
-        .step-status {
-            font-size: 20px;
+        .circle-step.complete { border-color: #4caf50; background: #4caf50; color: white; }
+        .step-label {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #666;
+            white-space: nowrap;
+            font-weight: 600;
         }
-        
+        .results-section { display: none; }
+        .results-section.show { display: block; }
         .results-card {
             background: #f8f9fa;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #4A90A4;
         }
-        
-        .results-card h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        
-        .results-card pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: inherit;
-            line-height: 1.6;
-            color: #555;
-        }
-        
         .transcript-editor {
             width: 100%;
             min-height: 200px;
             padding: 15px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
-            font-family: inherit;
             font-size: 14px;
-            line-height: 1.6;
             resize: vertical;
         }
-        
-        .sentiment-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .sentiment-item {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 3px solid #667eea;
-        }
-        
-        .sentiment-label {
-            font-weight: 600;
-            color: #666;
-            font-size: 12px;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-        
-        .sentiment-value {
-            color: #333;
-            font-size: 14px;
-        }
-        
-        .btn-secondary {
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
-        }
-        
-        .btn-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .confidence-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 15px;
-        }
-        
-        .pattern-alert {
-            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-        
-        .pattern-alert h4 {
-            color: #856404;
-            margin-bottom: 10px;
-        }
-        
-        .pattern-alert p {
-            color: #856404;
-            font-size: 14px;
-            line-height: 1.5;
-        }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn-secondary { background: white; color: #4A90A4; border: 2px solid #4A90A4; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">🧠</div>
-            <h1>Cognisync™</h1>
+            <img src="/cognisync-logo.png" alt="CogniSync Logo" class="logo">
             <p class="subtitle">AI-Powered Clinical Documentation</p>
         </div>
         
-        <!-- Upload Form -->
         <div class="form-section" id="formSection">
             <form id="uploadForm">
                 <div class="form-group">
-                    <label for="clientName">Patient Code / Subject ID</label>
-                    <input type="text" id="clientName" name="clientName" placeholder="e.g., CLIENT-001" required>
+                    <label>Patient Code / Subject ID</label>
+                    <input type="text" name="clientName" placeholder="e.g., CLIENT-001" required>
                 </div>
-                
                 <div class="form-group">
-                    <label for="therapyType">Therapy Protocol</label>
-                    <select id="therapyType" name="therapyType" required>
+                    <label>Therapy Protocol</label>
+                    <select name="therapyType" required>
                         <option value="CBT">Cognitive Behavioral Therapy (CBT)</option>
                         <option value="DBT">Dialectical Behavior Therapy (DBT)</option>
                         <option value="ACT">Acceptance & Commitment Therapy (ACT)</option>
-                        <option value="Psychodynamic">Psychodynamic Therapy</option>
-                        <option value="Humanistic">Humanistic Therapy</option>
-                        <option value="EMDR">EMDR</option>
                     </select>
                 </div>
-                
                 <div class="form-group">
-                    <label for="summaryFormat">Output Format</label>
-                    <select id="summaryFormat" name="summaryFormat" required>
-                        <option value="SOAP">SOAP (Subjective, Objective, Assessment, Plan)</option>
-                        <option value="BIRP">BIRP (Behavior, Intervention, Response, Plan)</option>
-                        <option value="General">General Analysis</option>
+                    <label>Output Format</label>
+                    <select name="summaryFormat" required>
+                        <option value="SOAP">SOAP</option>
+                        <option value="BIRP">BIRP</option>
                     </select>
                 </div>
-                
                 <div class="form-group">
                     <label>Audio File</label>
                     <div class="file-upload" id="fileUpload">
                         <input type="file" id="audioFile" name="audioFile" accept="audio/*">
-                        <div class="upload-icon">📁</div>
-                        <div class="upload-text">Tap to select audio file</div>
-                        <div class="upload-hint">MP3, WAV, M4A, MP4, WebM, OGG • Max 500MB</div>
+                        <div>📁</div>
+                        <div>Tap to select audio file</div>
                     </div>
                 </div>
-                
-                <div class="or-divider">
-                    <span>OR</span>
-                </div>
-                
+                <div class="or-divider"><span>OR</span></div>
                 <button type="button" class="record-button" id="recordBtn">
-                    <span class="record-icon">🎙️</span>
+                    <span>🎙️</span>
                     <span id="recordText">Record Live Session</span>
                 </button>
-                <div class="recording-timer" id="recordingTimer">Recording: 0:00</div>
-                
-                <button type="submit" class="btn btn-primary">
-                    🚀 Process Session
-                </button>
+                <button type="submit" class="btn btn-primary">🚀 Process Session</button>
             </form>
         </div>
         
-        <!-- Processing Animation -->
         <div class="processing" id="processing">
-            <div class="brain-animation">🧠</div>
-            <h2 style="color: #333; margin-bottom: 10px;">Processing Your Session</h2>
-            <p style="color: #666;">This may take a minute...</p>
-            
-            <div class="processing-steps">
-                <div class="step" id="step1">
-                    <div class="step-icon">🎙️</div>
-                    <div class="step-text">Transcribing audio</div>
-                    <div class="step-status">⏳</div>
-                </div>
-                <div class="step" id="step2">
-                    <div class="step-icon">🧠</div>
-                    <div class="step-text">Analyzing session content</div>
-                    <div class="step-status">⏳</div>
-                </div>
-                <div class="step" id="step3">
-                    <div class="step-icon">💭</div>
-                    <div class="step-text">Performing sentiment analysis</div>
-                    <div class="step-status">⏳</div>
-                </div>
-                <div class="step" id="step4">
-                    <div class="step-icon">📊</div>
-                    <div class="step-text">Extracting patterns</div>
-                    <div class="step-status">⏳</div>
-                </div>
+            <img src="/cognisync-logo.png" class="logo-animation">
+            <p style="color: #1B3A52; font-weight: 600; margin-bottom: 10px;">Processing Your Session</p>
+            <div class="circle-progress">
+                <div class="progress-line"><div class="progress-line-fill" id="progressFill"></div></div>
+                <div class="circle-step" id="circle1"><span>🎙️</span><div class="step-label">Transcribe</div></div>
+                <div class="circle-step" id="circle2"><span>🧠</span><div class="step-label">Analyze</div></div>
+                <div class="circle-step" id="circle3"><span>💭</span><div class="step-label">Sentiment</div></div>
+                <div class="circle-step" id="circle4"><span>📊</span><div class="step-label">Patterns</div></div>
             </div>
         </div>
         
-        <!-- Results Display -->
         <div class="results-section" id="resultsSection">
-            <div class="confidence-badge" id="confidenceBadge">
-                ✓ Analysis Complete • Confidence: 95%
-            </div>
-            
             <div class="results-card">
                 <h3>📋 Clinical Documentation</h3>
                 <pre id="clinicalNotes"></pre>
             </div>
-            
             <div class="results-card">
-                <h3>📝 Session Transcript (Editable)</h3>
+                <h3>📝 Session Transcript</h3>
                 <textarea class="transcript-editor" id="transcriptEditor"></textarea>
-                <button class="btn btn-secondary" style="margin-top: 10px;" onclick="saveTranscript()">
-                    💾 Save Transcript Edits
-                </button>
             </div>
-            
-            <div class="results-card">
-                <h3>💭 Sentiment Analysis</h3>
-                <div class="sentiment-grid" id="sentimentGrid"></div>
-            </div>
-            
-            <div class="results-card" id="patternCard" style="display: none;">
-                <h3>📊 Longitudinal Pattern Analysis</h3>
-                <div class="pattern-alert">
-                    <h4>🔍 Patterns Detected Across Sessions</h4>
-                    <p id="patternAnalysis"></p>
-                </div>
-            </div>
-            
             <div class="btn-group">
-                <button class="btn btn-primary" onclick="exportResults()">
-                    📥 Export Results
-                </button>
-                <button class="btn btn-secondary" onclick="startNew()">
-                    ➕ New Session
-                </button>
+                <button class="btn btn-primary" onclick="exportResults()">📥 Export</button>
+                <button class="btn btn-secondary" onclick="startNew()">➕ New Session</button>
             </div>
         </div>
     </div>
@@ -557,213 +234,82 @@
         let currentResults = null;
         let mediaRecorder = null;
         let recordedChunks = [];
-        let recordingStartTime = null;
-        let recordingInterval = null;
         
-        const form = document.getElementById('uploadForm');
-        const formSection = document.getElementById('formSection');
-        const processing = document.getElementById('processing');
-        const resultsSection = document.getElementById('resultsSection');
-        const fileUpload = document.getElementById('fileUpload');
-        const audioFile = document.getElementById('audioFile');
-        const recordBtn = document.getElementById('recordBtn');
-        const recordText = document.getElementById('recordText');
-        const recordingTimer = document.getElementById('recordingTimer');
-        
-        // File selection
-        audioFile.addEventListener('change', () => {
-            if (audioFile.files[0]) {
-                fileUpload.classList.add('has-file');
-                fileUpload.classList.remove('recording');
-            }
+        document.getElementById('audioFile').addEventListener('change', (e) => {
+            if (e.target.files[0]) document.getElementById('fileUpload').classList.add('has-file');
         });
         
-        // Record button handler
-        recordBtn.addEventListener('click', async () => {
+        document.getElementById('recordBtn').addEventListener('click', async () => {
             if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-                await startRecording();
-            } else {
-                stopRecording();
-            }
-        });
-        
-        // Start recording
-        async function startRecording() {
-            try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(stream);
                 recordedChunks = [];
-                
-                mediaRecorder.ondataavailable = (e) => {
-                    if (e.data.size > 0) {
-                        recordedChunks.push(e.data);
-                    }
-                };
-                
+                mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
                 mediaRecorder.onstop = () => {
                     const blob = new Blob(recordedChunks, { type: 'audio/webm' });
                     const file = new File([blob], `recording_${Date.now()}.webm`, { type: 'audio/webm' });
-                    
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(file);
-                    audioFile.files = dataTransfer.files;
-                    
-                    fileUpload.classList.add('has-file');
-                    fileUpload.classList.remove('recording');
-                    stream.getTracks().forEach(track => track.stop());
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    document.getElementById('audioFile').files = dt.files;
+                    document.getElementById('fileUpload').classList.add('has-file');
+                    stream.getTracks().forEach(t => t.stop());
                 };
-                
                 mediaRecorder.start();
-                recordingStartTime = Date.now();
-                
-                recordBtn.classList.add('recording');
-                recordText.textContent = 'Stop Recording';
-                fileUpload.classList.add('recording');
-                recordingTimer.classList.add('show');
-                
-                recordingInterval = setInterval(updateRecordingTimer, 1000);
-                
-            } catch (error) {
-                alert('Microphone access denied. Please enable microphone permissions.');
-            }
-        }
-        
-        // Stop recording
-        function stopRecording() {
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                document.getElementById('recordBtn').classList.add('recording');
+                document.getElementById('recordText').textContent = 'Stop Recording';
+            } else {
                 mediaRecorder.stop();
-                recordBtn.classList.remove('recording');
-                recordText.textContent = 'Record Live Session';
-                recordingTimer.classList.remove('show');
-                clearInterval(recordingInterval);
-            }
-        }
-        
-        // Update recording timer
-        function updateRecordingTimer() {
-            const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
-            const minutes = Math.floor(elapsed / 60);
-            const seconds = elapsed % 60;
-            recordingTimer.textContent = `Recording: ${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-        
-        // Form submission
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (!audioFile.files[0]) {
-                alert('Please select an audio file or record a session');
-                return;
-            }
-            
-            // Show processing animation
-            formSection.classList.add('hidden');
-            processing.classList.add('show');
-            
-            // Animate processing steps
-            animateProcessing();
-            
-            // Upload and process
-            const formData = new FormData(form);
-            
-            try {
-                const response = await fetch('/api/therapy/sessions', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    currentResults = data;
-                    displayResults(data);
-                } else {
-                    alert('Error: ' + (data.error || 'Processing failed'));
-                    startNew();
-                }
-            } catch (error) {
-                alert('Network error: ' + error.message);
-                startNew();
+                document.getElementById('recordBtn').classList.remove('recording');
+                document.getElementById('recordText').textContent = 'Record Live Session';
             }
         });
         
-        async function animateProcessing() {
-            const steps = ['step1', 'step2', 'step3', 'step4'];
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('processing').classList.add('show');
             
-            for (let i = 0; i < steps.length; i++) {
-                const step = document.getElementById(steps[i]);
-                step.classList.add('active');
-                
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                step.classList.remove('active');
-                step.classList.add('complete');
-                step.querySelector('.step-status').textContent = '✓';
-            }
-        }
-        
-        function displayResults(data) {
-            processing.classList.remove('show');
-            resultsSection.classList.add('show');
-            
-            document.getElementById('clinicalNotes').textContent = data.analysis || 'No analysis available';
-            document.getElementById('transcriptEditor').value = data.transcript || 'No transcript available';
-            
-            const sentimentGrid = document.getElementById('sentimentGrid');
-            sentimentGrid.innerHTML = '';
-            
-            if (data.sentimentAnalysis) {
-                const sentiment = data.sentimentAnalysis;
-                
-                Object.keys(sentiment).forEach(key => {
-                    const item = document.createElement('div');
-                    item.className = 'sentiment-item';
-                    item.innerHTML = `
-                        <div class="sentiment-label">${key.replace(/([A-Z])/g, ' $1').trim()}</div>
-                        <div class="sentiment-value">${JSON.stringify(sentiment[key]).replace(/["\[\]]/g, '')}</div>
-                    `;
-                    sentimentGrid.appendChild(item);
-                });
+            // Animate circles
+            const circles = ['circle1', 'circle2', 'circle3', 'circle4'];
+            for (let i = 0; i < circles.length; i++) {
+                document.getElementById(circles[i]).classList.add('active');
+                document.getElementById('progressFill').style.width = `${(i + 1) * 25}%`;
+                await new Promise(r => setTimeout(r, 2000));
+                document.getElementById(circles[i]).classList.remove('active');
+                document.getElementById(circles[i]).classList.add('complete');
             }
             
-            if (data.patternAnalysis) {
-                document.getElementById('patternCard').style.display = 'block';
-                document.getElementById('patternAnalysis').textContent = data.patternAnalysis;
-            }
+            const formData = new FormData(e.target);
+            const response = await fetch('/api/therapy/sessions', { method: 'POST', body: formData });
+            const data = await response.json();
             
-            const confidence = Math.round((data.confidenceScore || 0.95) * 100);
-            document.getElementById('confidenceBadge').textContent = `✓ Analysis Complete • Confidence: ${confidence}%`;
-        }
-        
-        function saveTranscript() {
-            const editedTranscript = document.getElementById('transcriptEditor').value;
-            currentResults.transcript = editedTranscript;
-            alert('✓ Transcript saved!');
-        }
+            if (data.success) {
+                currentResults = data;
+                document.getElementById('processing').classList.remove('show');
+                document.getElementById('resultsSection').classList.add('show');
+                document.getElementById('clinicalNotes').textContent = data.analysis || 'No analysis';
+                document.getElementById('transcriptEditor').value = data.transcript || 'No transcript';
+            }
+        });
         
         function exportResults() {
             const blob = new Blob([JSON.stringify(currentResults, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `cognisync-session-${Date.now()}.json`;
+            a.download = `cognisync-${Date.now()}.json`;
             a.click();
         }
         
         function startNew() {
-            formSection.classList.remove('hidden');
-            processing.classList.remove('show');
-            resultsSection.classList.remove('show');
-            form.reset();
-            fileUpload.classList.remove('has-file', 'recording');
-            
-            ['step1', 'step2', 'step3', 'step4'].forEach(id => {
-                const step = document.getElementById(id);
-                step.classList.remove('active', 'complete');
-                step.querySelector('.step-status').textContent = '⏳';
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('resultsSection').classList.remove('show');
+            document.getElementById('uploadForm').reset();
+            ['circle1', 'circle2', 'circle3', 'circle4'].forEach(id => {
+                document.getElementById(id).classList.remove('active', 'complete');
             });
+            document.getElementById('progressFill').style.width = '0%';
         }
     </script>
 </body>
 </html>
-
