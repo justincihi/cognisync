@@ -5,6 +5,8 @@ Handles audio transcription, analysis, and pattern tracking
 
 import os
 import json
+import subprocess
+import tempfile
 from datetime import datetime
 from openai import OpenAI
 from anthropic import Anthropic
@@ -12,6 +14,65 @@ from anthropic import Anthropic
 # Initialize clients
 openai_client = OpenAI()
 anthropic_client = Anthropic()
+
+def extract_audio_from_video(video_path):
+    """
+    Extract audio from video file and save as MP3
+    
+    Args:
+        video_path: Path to the video file
+        
+    Returns:
+        str: Path to extracted audio file (temporary)
+    """
+    try:
+        # Create temporary file for audio
+        temp_audio = tempfile.NamedTemporaryFile(suffix='.mp3', delete=False)
+        temp_audio_path = temp_audio.name
+        temp_audio.close()
+        
+        # Extract audio using ffmpeg
+        # -i: input file
+        # -vn: no video
+        # -acodec libmp3lame: use MP3 codec
+        # -ar 16000: sample rate 16kHz (good for speech)
+        # -ac 1: mono audio
+        # -b:a 64k: bitrate 64kbps (good for speech, small file)
+        cmd = [
+            'ffmpeg',
+            '-i', video_path,
+            '-vn',  # No video
+            '-acodec', 'libmp3lame',
+            '-ar', '16000',  # 16kHz sample rate
+            '-ac', '1',  # Mono
+            '-b:a', '64k',  # 64kbps bitrate
+            '-y',  # Overwrite output file
+            temp_audio_path
+        ]
+        
+        result = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=300  # 5 minute timeout
+        )
+        
+        if result.returncode != 0:
+            raise Exception(f"FFmpeg failed: {result.stderr.decode()}")
+        
+        # Check if file was created and has content
+        if not os.path.exists(temp_audio_path) or os.path.getsize(temp_audio_path) == 0:
+            raise Exception("Audio extraction produced empty file")
+        
+        print(f"✅ Extracted audio: {os.path.getsize(temp_audio_path)} bytes")
+        return temp_audio_path
+        
+    except Exception as e:
+        print(f"❌ Audio extraction failed: {e}")
+        # Clean up temp file if it exists
+        if 'temp_audio_path' in locals() and os.path.exists(temp_audio_path):
+            os.unlink(temp_audio_path)
+        return None
 
 def transcribe_audio(audio_file_path):
     """
@@ -259,9 +320,37 @@ def process_therapy_session(audio_file_path, client_name, therapy_type, summary_
         'success': True
     }
     
+    # Step 0: Extract audio if video file
+    audio_to_transcribe = audio_file_path
+    temp_audio_path = None
+    
+    # Check if file is a video format
+    video_extensions = ['.mp4', '.webm', '.avi', '.mov', '.mkv', '.flv']
+    file_ext = os.path.splitext(audio_file_path)[1].lower()
+    
+    if file_ext in video_extensions:
+        print(f"🎥 Detected video file, extracting audio...")
+        temp_audio_path = extract_audio_from_video(audio_file_path)
+        
+        if temp_audio_path:
+            audio_to_transcribe = temp_audio_path
+            print(f"✅ Using extracted audio: {os.path.getsize(audio_to_transcribe)} bytes")
+        else:
+            results['success'] = False
+            results['error'] = "Failed to extract audio from video"
+            return results
+    
     # Step 1: Transcribe audio
     print(f"🎙️ Transcribing audio for {client_name}...")
-    transcription = transcribe_audio(audio_file_path)
+    transcription = transcribe_audio(audio_to_transcribe)
+    
+    # Clean up temporary audio file if created
+    if temp_audio_path and os.path.exists(temp_audio_path):
+        try:
+            os.unlink(temp_audio_path)
+            print(f"🧹 Cleaned up temporary audio file")
+        except:
+            pass
     
     if not transcription['success']:
         results['success'] = False
