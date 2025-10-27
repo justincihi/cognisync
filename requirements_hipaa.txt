@@ -1,0 +1,55 @@
+# Core Flask dependencies
+Flask==3.0.0
+Flask-CORS==4.0.0
+Werkzeug==3.0.1
+
+# Database
+sqlite3  # Built-in with Python
+# pysqlcipher3==1.1.0  # Uncomment for full database encryption (requires compilation)
+
+# Encryption
+cryptography==41.0.7
+pycryptodome==3.19.0
+
+# Multi-Factor Authentication
+pyotp==2.9.0
+qrcode==7.4.2
+Pillow==10.1.0
+
+# AI Services
+openai==1.3.7
+anthropic==0.7.7
+
+# Azure OpenAI (HIPAA-compliant alternative)
+# azure-ai-openai==1.0.0  # Uncomment when using Azure
+
+# Audio processing
+# whisper==1.1.10  # Local Whisper (optional)
+
+# Document generation
+fpdf2==2.7.6
+python-docx==1.1.0
+markdown==3.5.1
+
+# Utilities
+python-dotenv==1.0.0
+requests==2.31.0
+
+# Security
+bcrypt==4.1.1
+PyJWT==2.8.0
+
+# Logging and monitoring
+python-json-logger==2.0.7
+
+# Date/time
+python-dateutil==2.8.2
+
+# For production deployment
+gunicorn==21.2.0
+gevent==23.9.1
+
+# Optional: For better performance
+# psycopg2-binary==2.9.9  # PostgreSQL (recommended for production)
+# redis==5.0.1  # For session management
+
