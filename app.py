@@ -873,8 +873,38 @@ def create_session():
             summary_format = data.get('summaryFormat', 'SOAP')
             transcript_note = "Simulated session data used for demonstration."
         
-        # Generate analysis
-        result = generate_comprehensive_analysis(client_name, therapy_type, summary_format)
+        # Generate analysis (use real AI if file uploaded and USE_REAL_AI is true)
+        if USE_REAL_AI and file_info and file_info.get('success') and file_info.get('file_path'):
+            logger.info(f"🤖 Processing with REAL AI: {file_info['file_path']}")
+            try:
+                # Process with real AI
+                ai_results = process_therapy_session(
+                    file_info['file_path'],
+                    client_name,
+                    therapy_type,
+                    summary_format,
+                    []
+                )
+                
+                if ai_results.get('success'):
+                    transcript_note = ai_results.get('transcript', 'Transcription completed')
+                    result = {
+                        'analysis': ai_results.get('analysis', ''),
+                        'sentimentAnalysis': ai_results.get('sentiment_analysis', {}),
+                        'validationAnalysis': 'AI-powered analysis using OpenAI Whisper + GPT-4 + Claude',
+                        'confidenceScore': ai_results.get('confidence_score', 0.95),
+                        'patternAnalysis': ai_results.get('pattern_analysis', None)
+                    }
+                    logger.info("✅ Real AI processing completed successfully")
+                else:
+                    logger.error(f"❌ AI processing failed: {ai_results.get('error')}, falling back to demo")
+                    result = generate_comprehensive_analysis(client_name, therapy_type, summary_format)
+            except Exception as e:
+                logger.error(f"❌ AI processing exception: {e}, falling back to demo")
+                result = generate_comprehensive_analysis(client_name, therapy_type, summary_format)
+        else:
+            logger.info("🎭 Using DEMO mode (no file or USE_REAL_AI=false)")
+            result = generate_comprehensive_analysis(client_name, therapy_type, summary_format)
         
         # Add transcript note to analysis
         result['transcript'] = transcript_note
